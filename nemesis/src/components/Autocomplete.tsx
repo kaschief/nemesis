@@ -20,7 +20,6 @@ export const AutoComplete: React.FC = () => {
     const element = e.target as HTMLElement;
     const elementText: string = element.children[0].innerHTML;
     const activeIndex: unknown = element.getAttribute("data-id");
-    console.log(activeIndex);
 
     setDisplayedText(elementText);
     setSelectedIndex(activeIndex as number);
@@ -74,6 +73,38 @@ export const AutoComplete: React.FC = () => {
     }
   }, [isMount, input]);
 
+  const Suggestions: React.FC = (): JSX.Element => {
+    return (
+      <>
+        {filteredOptions.map((fruit: string, index: number) => {
+          if (fruit.indexOf(input) > -1 && input.length > 0) {
+            const word = fruit;
+            const val =
+              word.slice(0, word.indexOf(input)) +
+              "<b>" +
+              input +
+              "</b>" +
+              word.slice(word.indexOf(input) + input.length, word.length);
+
+            return (
+              <div
+                className={`list-item ${
+                  index === selectedIndex ? "selected" : ""
+                }`}
+                key={index}
+                onMouseEnter={hoverChange}
+                onClick={handleClick}
+                data-id={index}
+              >
+                <p dangerouslySetInnerHTML={{ __html: val }}></p>
+              </div>
+            );
+          }
+        })}
+      </>
+    );
+  };
+
   return (
     <div className="autocomplete">
       <input
@@ -85,20 +116,7 @@ export const AutoComplete: React.FC = () => {
         onKeyDown={handleOptionSelect}
       />
 
-      {showSuggestions &&
-        filteredOptions.map((fruit: string, index: number) => {
-          return (
-            <div
-              className={`list-item ${index === selectedIndex && "selected"}`}
-              key={index}
-              onMouseEnter={hoverChange}
-              onClick={handleClick}
-              data-id={index}
-            >
-              <p>{fruit}</p>
-            </div>
-          );
-        })}
+      {showSuggestions && <Suggestions />}
     </div>
   );
 };
