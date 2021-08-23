@@ -22,7 +22,7 @@ export const AutoComplete: React.FC<Props> = ({ suggestions, placeholder }) => {
 
   const hoverChange = (e: React.MouseEvent<HTMLDivElement>): void => {
     const element = e.target as HTMLElement;
-    const elementText: unknown = element.getAttribute("data-name");
+    const elementText: string | null = element.getAttribute("data-name");
     const activeIndex: unknown = element.getAttribute("data-id");
 
     setDisplayedText(elementText as string);
@@ -31,14 +31,13 @@ export const AutoComplete: React.FC<Props> = ({ suggestions, placeholder }) => {
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>): void => {
     const element = e.target as HTMLElement;
-    const elementText: string = element.children[0].innerHTML;
+    const elementText: string | null = element.getAttribute("data-name");
 
-    setInput(elementText);
-    setDisplayedText(elementText);
+    setInput(elementText as string);
+    setDisplayedText(elementText as string);
+    setSelectedIndex(0);
     setFilteredOptions([]);
-    setTimeout(() => {
-      setShowSuggestions(false);
-    }, 300);
+    setShowSuggestions(false);
   };
 
   const handleOptionSelect = (
@@ -46,17 +45,19 @@ export const AutoComplete: React.FC<Props> = ({ suggestions, placeholder }) => {
   ): JSX.Element | undefined => {
     if (e.code === "Enter") {
       setInput(filteredOptions[selectedIndex]);
+      setDisplayedText(filteredOptions[selectedIndex]);
       setSelectedIndex(0);
-      setTimeout(() => {
-        setShowSuggestions(false);
-      }, 300);
+      setFilteredOptions([]);
+      setShowSuggestions(false);
     } else if (e.code === "ArrowUp") {
       if (selectedIndex === 0) {
         return;
+      } else if (selectedIndex > 0) {
+        setSelectedIndex(selectedIndex - 1);
+        setDisplayedText(filteredOptions[selectedIndex - 1]);
       }
-      setSelectedIndex(selectedIndex - 1);
-      setDisplayedText(filteredOptions[selectedIndex - 1]);
     } else if (e.code === "ArrowDown") {
+      console.log(selectedIndex, filteredOptions[selectedIndex + 1], e.code);
       if (selectedIndex - 1 === filteredOptions.length) {
         return;
       } else if (selectedIndex + 1 < filteredOptions.length) {
@@ -79,7 +80,7 @@ export const AutoComplete: React.FC<Props> = ({ suggestions, placeholder }) => {
 
   const Suggestions: React.FC = (): JSX.Element => {
     return (
-      <>
+      <div className="suggestions">
         {filteredOptions.map((suggestion: string, index: number) => {
           if (suggestion.indexOf(input) > -1 && input.length > 0) {
             const word = suggestion;
@@ -93,9 +94,7 @@ export const AutoComplete: React.FC<Props> = ({ suggestions, placeholder }) => {
 
             return (
               <div
-                className={`list-item ${
-                  index === selectedIndex ? "selected" : ""
-                }`}
+                className={`list-item ${index === 0 ? "selected" : ""}`}
                 key={index}
                 onMouseEnter={hoverChange}
                 onClick={handleClick}
@@ -107,7 +106,7 @@ export const AutoComplete: React.FC<Props> = ({ suggestions, placeholder }) => {
             );
           }
         })}
-      </>
+      </div>
     );
   };
 
@@ -122,7 +121,7 @@ export const AutoComplete: React.FC<Props> = ({ suggestions, placeholder }) => {
         onKeyDown={handleOptionSelect}
       />
 
-      {showSuggestions && <Suggestions />}
+      {showSuggestions && input && <Suggestions />}
     </div>
   );
 };

@@ -102,7 +102,6 @@ export const fruits: string[] = [
   "White currant",
   "White sapote",
   "Yuzu",
-  "Avocado",
   "Bell pepper",
   "Chili pepper",
   "Corn kernel",
