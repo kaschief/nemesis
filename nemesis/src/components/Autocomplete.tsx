@@ -80,33 +80,39 @@ export const AutoComplete: React.FC<Props> = ({ suggestions, placeholder }) => {
   const Suggestions: React.FC = (): JSX.Element => {
     return (
       <div className="suggestions">
-        {filteredOptions.map((suggestion: string, index: number) => {
-          if (suggestion.indexOf(input) > -1 && input.length > 0) {
-            const word = suggestion;
-            const val = `${word.slice(
-              0,
-              word.indexOf(input)
-            )}<b>${input}</b>${word.slice(
-              word.indexOf(input) + input.length,
-              word.length
-            )}`;
+        {filteredOptions.length ? (
+          filteredOptions.map((suggestion: string, index: number) => {
+            if (suggestion.indexOf(input) > -1 && input.length > 0) {
+              const word = suggestion;
+              const val = `${word.slice(
+                0,
+                word.indexOf(input)
+              )}<b>${input}</b>${word.slice(
+                word.indexOf(input) + input.length,
+                word.length
+              )}`;
 
-            return (
-              <div
-                className={`list-item ${
-                  index === selectedIndex ? "selected" : ""
-                }`}
-                key={index}
-                onMouseEnter={hoverChange}
-                onClick={handleClick}
-                data-id={index}
-                data-name={suggestion}
-              >
-                <p dangerouslySetInnerHTML={{ __html: val }}></p>
-              </div>
-            );
-          }
-        })}
+              return (
+                <div
+                  className={`list-item ${
+                    index === selectedIndex ? "selected" : ""
+                  }`}
+                  key={index}
+                  onMouseEnter={hoverChange}
+                  onClick={handleClick}
+                  data-id={index}
+                  data-name={suggestion}
+                >
+                  <p dangerouslySetInnerHTML={{ __html: val }}></p>
+                </div>
+              );
+            }
+          })
+        ) : (
+          <div className="empty">
+            <p>Oops, seems we don't have any matches for {input}</p>
+          </div>
+        )}
       </div>
     );
   };
