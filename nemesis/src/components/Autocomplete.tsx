@@ -57,7 +57,6 @@ export const AutoComplete: React.FC<Props> = ({ suggestions, placeholder }) => {
         setDisplayedText(filteredOptions[selectedIndex - 1]);
       }
     } else if (e.code === "ArrowDown") {
-      console.log(selectedIndex, filteredOptions[selectedIndex + 1], e.code);
       if (selectedIndex - 1 === filteredOptions.length) {
         return;
       } else if (selectedIndex + 1 < filteredOptions.length) {
@@ -94,7 +93,9 @@ export const AutoComplete: React.FC<Props> = ({ suggestions, placeholder }) => {
 
             return (
               <div
-                className={`list-item ${index === 0 ? "selected" : ""}`}
+                className={`list-item ${
+                  index === selectedIndex ? "selected" : ""
+                }`}
                 key={index}
                 onMouseEnter={hoverChange}
                 onClick={handleClick}
