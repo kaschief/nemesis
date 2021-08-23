@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { fruits } from "../fruits";
 import { useIsMount } from "../useIsMount";
 
-export const AutoComplete: React.FC = () => {
+interface Props {
+  suggestions: string[];
+  placeholder: string;
+}
+
+export const AutoComplete: React.FC<Props> = ({ suggestions, placeholder }) => {
   const [input, setInput] = useState("");
   const [displayedText, setDisplayedText] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -18,10 +22,10 @@ export const AutoComplete: React.FC = () => {
 
   const hoverChange = (e: React.MouseEvent<HTMLDivElement>): void => {
     const element = e.target as HTMLElement;
-    const elementText: string = element.children[0].innerHTML;
+    const elementText: unknown = element.getAttribute("data-name");
     const activeIndex: unknown = element.getAttribute("data-id");
 
-    setDisplayedText(elementText);
+    setDisplayedText(elementText as string);
     setSelectedIndex(activeIndex as number);
   };
 
@@ -66,25 +70,26 @@ export const AutoComplete: React.FC = () => {
 
   useEffect(() => {
     if (!isMount) {
-      const filtered: string[] = fruits
-        .map((fruit) => fruit.toLowerCase())
-        .filter((fruit) => fruit.includes(input));
+      const filtered: string[] = suggestions
+        .map((suggestion) => suggestion.toLowerCase())
+        .filter((suggestion) => suggestion.includes(input));
       setFilteredOptions(filtered);
     }
-  }, [isMount, input]);
+  }, [isMount, input, suggestions]);
 
   const Suggestions: React.FC = (): JSX.Element => {
     return (
       <>
-        {filteredOptions.map((fruit: string, index: number) => {
-          if (fruit.indexOf(input) > -1 && input.length > 0) {
-            const word = fruit;
-            const val =
-              word.slice(0, word.indexOf(input)) +
-              "<b>" +
-              input +
-              "</b>" +
-              word.slice(word.indexOf(input) + input.length, word.length);
+        {filteredOptions.map((suggestion: string, index: number) => {
+          if (suggestion.indexOf(input) > -1 && input.length > 0) {
+            const word = suggestion;
+            const val = `${word.slice(
+              0,
+              word.indexOf(input)
+            )}<b>${input}</b>${word.slice(
+              word.indexOf(input) + input.length,
+              word.length
+            )}`;
 
             return (
               <div
@@ -95,6 +100,7 @@ export const AutoComplete: React.FC = () => {
                 onMouseEnter={hoverChange}
                 onClick={handleClick}
                 data-id={index}
+                data-name={suggestion}
               >
                 <p dangerouslySetInnerHTML={{ __html: val }}></p>
               </div>
@@ -109,7 +115,7 @@ export const AutoComplete: React.FC = () => {
     <div className="autocomplete">
       <input
         name="search"
-        placeholder="search"
+        placeholder={placeholder}
         type="text"
         value={displayedText}
         onChange={handleChange}
